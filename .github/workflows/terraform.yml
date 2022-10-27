@@ -6,6 +6,11 @@ on:
       - main
   pull_request:
 
+env:
+  GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+  TF_VAR_region: "us-central1"
+  TF_VAR_project_id: "sandbox-364517"
+
 jobs:
   terraform:
     name: "Terraform"
@@ -22,44 +27,25 @@ jobs:
       - name: Terraform Init
         id: init
         run: terraform init
-        env:
-          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
-          TF_VAR_region: "us-central1"
-          TF_VAR_project_id: "sandbox-364517"
 
       - name: Terraform Format
         id: fmt
         run: terraform fmt -check
-        env:
-          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
-          TF_VAR_region: "us-central1"
-          TF_VAR_project_id: "sandbox-364517"
 
       - name: Terraform Validate
         id: validate
         run: terraform validate -no-color
-        env:
-          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
-          TF_VAR_region: "us-central1"
-          TF_VAR_project_id: "sandbox-364517"
 
       - name: Terraform Plan
         id: plan
         if: github.event_name == 'pull_request'
         run: terraform plan -no-color -input=false
         continue-on-error: true
-        env:
-          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
-          TF_VAR_region: "us-central1"
-          TF_VAR_project_id: "sandbox-364517"
 
       - uses: actions/github-script@v6
         if: github.event_name == 'pull_request'
         env:
           PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
-          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
-          TF_VAR_region: "us-central1"
-          TF_VAR_project_id: "sandbox-364517"
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -92,7 +78,3 @@ jobs:
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform apply -auto-approve -input=false
-        env:
-          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
-          TF_VAR_region: "us-central1"
-          TF_VAR_project_id: "sandbox-364517"
