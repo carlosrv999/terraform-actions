@@ -9,3 +9,10 @@ resource "google_compute_subnetwork" "public_1" {
   region        = var.region
   network       = google_compute_network.default.name
 }
+
+resource "google_compute_subnetwork" "public_2" {
+  name          = "tf-subnet-public-1"
+  ip_cidr_range = "10.125.16.0/20"
+  region        = var.region
+  network       = google_compute_network.default.name
+}
